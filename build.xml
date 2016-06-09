@@ -1,0 +1,78 @@
+<?xml version="1.0"?> 
+<project name="abgabe10-eggenber15" default="jar">
+
+	<property file="build.properties" />
+	
+
+	<!-- define external libs, like junit -->
+	<path id="externalLibs">
+		<pathelement location="${libs}/junit-4.10.jar" />
+	</path>
+
+	<!-- define fileset for source code -->
+	<fileset id="javaCode" dir="${src.java}" includes="**/*.java">
+	</fileset>
+
+	<!-- define fileset for test code -->
+	<fileset id="junitTestCode" dir="${src.junit}" includes="**/*Test.java">
+	</fileset>
+	
+	<!-- clean -->
+    <target name="clean">
+        <delete dir="target" />
+    </target>
+	
+	<!-- prepare everything -->
+    <target name="prepare" depends="clean" description="prepare folder structure for compiling classes and generating documentation">
+		<mkdir dir="${target.java}" />
+		<mkdir dir="${target.junit}" />
+		<mkdir dir="${target.jar}" />
+    	<mkdir dir="${target.testreports}" />
+    </target>
+
+	<target name="compile" depends="prepare" description="compiles java sources">
+		<!-- compile java sources -->
+		<javac srcdir="${src.java}" destdir="${target.java}" includeantruntime="false" />
+		<!-- compile junit test sources -->
+		<javac srcdir="${src.junit}" destdir="${target.junit}" includeantruntime="false">
+			<classpath>
+				<pathelement location="${target.java}" />
+				<path refid="externalLibs" /> <!-- are needed because junit is not standard implemented to jdk -->
+			</classpath>
+		</javac>
+	</target>
+
+	
+	<!-- run all tests and complete script will halt on failure -->
+	<target name="test" depends="compile" description="testing the java source code">
+		<junit printsummary="true">
+			<classpath>
+				<pathelement location="${target.java}" />
+				<pathelement location="${target.junit}" />
+				<path refid="externalLibs" />
+			</classpath>
+			
+			<batchtest todir="${target.testreports}">
+				<fileset refid="junitTestCode" />
+			</batchtest>
+			<formatter type="plain" />
+		</junit>
+	</target>
+	
+
+	<!-- create jar file for later use -->
+    <target name="jar" depends="test" description="creates jar archive for deployement">
+        <mkdir dir="${target.jar}" />
+        <jar destfile="${target.jar}/Point2d.jar" >
+            <manifest>
+                <attribute name="Main-Class" value="at.fhj.itm.Point2d" />
+            </manifest>
+			<fileset dir="${target.java}">
+				<include name="**/*.class" />
+			</fileset>
+        </jar>
+    </target>
+
+
+</project>
+

@@ -20,6 +20,7 @@
 	<!-- clean -->
     <target name="clean">
         <delete dir="target" />
+    	<delete file="results.txt" />
     </target>
 	
 	<!-- prepare everything -->
@@ -65,12 +66,23 @@
         <mkdir dir="${target.jar}" />
         <jar destfile="${target.jar}/Point2d.jar" >
             <manifest>
-                <attribute name="Main-Class" value="at.fhj.itm.Point2d" />
+                <attribute name="Main-Class" value="at.fhj.itm.Main" />
             </manifest>
 			<fileset dir="${target.java}">
 				<include name="**/*.class" />
 			</fileset>
         </jar>
+    </target>
+	
+	
+    <target name="run" depends="jar">
+        <echo message="Attempting to run!" />
+        <java jar="${target.jar}/Point2d.jar" output="results.txt" fork="true" >
+			<arg value="4" />
+			<arg value="3" />
+        	<arg value="40" />
+        	<arg value="30" />
+    	</java>
     </target>
 
 
